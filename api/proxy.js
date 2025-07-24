@@ -10,10 +10,17 @@ export default async function handler(req, res) {
 
     let html = await response.text();
 
+    // Clean unwanted parts (header/footer/logo/copyright/cookies/chat)
     html = html.replace(/<header[\s\S]*?<\/header>/gi, '');
     html = html.replace(/<footer[\s\S]*?<\/footer>/gi, '');
     html = html.replace(/<img[^>]*logo[^>]*>/gi, '');
     html = html.replace(/<div[^>]*?copyright[^>]*?>[\s\S]*?<\/div>/gi, '');
+    html = html.replace(/<div[^>]*?cookie[^>]*?>[\s\S]*?<\/div>/gi, '');
+    html = html.replace(/<div[^>]*?chat[^>]*?>[\s\S]*?<\/div>/gi, '');
+
+    // Optional: remove specific phrases (as backup)
+    html = html.replace(/Digitavision Limited 2017 - 2025[^<]+/gi, '');
+    html = html.replace(/This site uses cookies[^<]+/gi, '');
 
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(html);
