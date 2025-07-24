@@ -10,18 +10,28 @@ export default async function handler(req, res) {
 
     let html = await response.text();
 
-    // Remove specific elements by known inner text and widgets
-    html = html
-      .replace(/<header[\s\S]*?<\/header>/gi, '')
-      .replace(/<footer[\s\S]*?<\/footer>/gi, '')
-      .replace(/<img[^>]*logo[^>]*>/gi, '')
-      .replace(/© Digitavision Limited 2017 - 2025 No #1 SEO Group Buy Service Provider Cheapest Price !/gi, '')
-      .replace(/<div[^>]*?(intercom|chat|tawk|zopim|widget)[^>]*?>[\s\S]*?<\/div>/gi, '')
-      .replace(/<script[\s\S]*?(intercom|chat|widget)[\s\S]*?<\/script>/gi, '')
-      .replace(/<link[^>]*?(intercom|chat|widget)[^>]*?>/gi, '')
-      .replace(/<iframe[\s\S]*?<\/iframe>/gi, '') // remove any iframe
-      .replace(/Accept<\/a>/gi, '')
-      .replace(/This site uses cookies[^<]+/gi, '');
+    // Custom CSS to hide copyright, chat, cookies, logos
+    const customCSS = `
+      <style>
+        footer, header,
+        [class*="chat"],
+        [id*="chat"],
+        [class*="cookie"],
+        [id*="cookie"],
+        [class*="intercom"],
+        [id*="intercom"],
+        div[style*="position: fixed"],
+        div:has(> a[href*="Accept"]),
+        div:has(> small),
+        div:has(> span:contains('Digitavision')),
+        img[src*="logo"] {
+          display: none !important;
+        }
+      </style>
+    `;
+
+    // Inject the custom CSS into <head>
+    html = html.replace(/<\/head>/i, `${customCSS}</head>`);
 
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(html);
