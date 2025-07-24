@@ -10,17 +10,25 @@ export default async function handler(req, res) {
 
     let html = await response.text();
 
-    // Clean unwanted parts (header/footer/logo/copyright/cookies/chat)
-    html = html.replace(/<header[\s\S]*?<\/header>/gi, '');
-    html = html.replace(/<footer[\s\S]*?<\/footer>/gi, '');
-    html = html.replace(/<img[^>]*logo[^>]*>/gi, '');
-    html = html.replace(/<div[^>]*?copyright[^>]*?>[\s\S]*?<\/div>/gi, '');
-    html = html.replace(/<div[^>]*?cookie[^>]*?>[\s\S]*?<\/div>/gi, '');
-    html = html.replace(/<div[^>]*?chat[^>]*?>[\s\S]*?<\/div>/gi, '');
-
-    // Optional: remove specific phrases (as backup)
-    html = html.replace(/Digitavision Limited 2017 - 2025[^<]+/gi, '');
-    html = html.replace(/This site uses cookies[^<]+/gi, '');
+    // Remove headers, footers, logos, cookie bars, and chat icons
+    html = html
+      // Remove header/footer/logo
+      .replace(/<header[\s\S]*?<\/header>/gi, '')
+      .replace(/<footer[\s\S]*?<\/footer>/gi, '')
+      .replace(/<img[^>]*logo[^>]*>/gi, '')
+      // Remove copyright section
+      .replace(/© Digitavision[^<]+/gi, '')
+      .replace(/<div[^>]*?copyright[^>]*?>[\s\S]*?<\/div>/gi, '')
+      // Remove cookie consent sections
+      .replace(/<div[^>]*?cookie[^>]*?>[\s\S]*?<\/div>/gi, '')
+      .replace(/This site uses cookies[^<]+<a[^>]*>Accept<\/a>/gi, '')
+      .replace(/Accept<\/a>/gi, '')
+      // Remove chat widget icons (JS or iframe-based)
+      .replace(/<script[^>]*chat[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<iframe[^>]*chat[^>]*>[\s\S]*?<\/iframe>/gi, '')
+      .replace(/<div[^>]*chat[^>]*?>[\s\S]*?<\/div>/gi, '')
+      .replace(/<div[^>]*intercom[^>]*?>[\s\S]*?<\/div>/gi, '')
+      .replace(/<script[\s\S]*?widget[\s\S]*?<\/script>/gi, '');
 
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(html);
