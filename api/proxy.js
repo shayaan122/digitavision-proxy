@@ -10,25 +10,18 @@ export default async function handler(req, res) {
 
     let html = await response.text();
 
-    // Remove headers, footers, logos, cookie bars, and chat icons
+    // Remove specific elements by known inner text and widgets
     html = html
-      // Remove header/footer/logo
       .replace(/<header[\s\S]*?<\/header>/gi, '')
       .replace(/<footer[\s\S]*?<\/footer>/gi, '')
       .replace(/<img[^>]*logo[^>]*>/gi, '')
-      // Remove copyright section
-      .replace(/© Digitavision[^<]+/gi, '')
-      .replace(/<div[^>]*?copyright[^>]*?>[\s\S]*?<\/div>/gi, '')
-      // Remove cookie consent sections
-      .replace(/<div[^>]*?cookie[^>]*?>[\s\S]*?<\/div>/gi, '')
-      .replace(/This site uses cookies[^<]+<a[^>]*>Accept<\/a>/gi, '')
+      .replace(/© Digitavision Limited 2017 - 2025 No #1 SEO Group Buy Service Provider Cheapest Price !/gi, '')
+      .replace(/<div[^>]*?(intercom|chat|tawk|zopim|widget)[^>]*?>[\s\S]*?<\/div>/gi, '')
+      .replace(/<script[\s\S]*?(intercom|chat|widget)[\s\S]*?<\/script>/gi, '')
+      .replace(/<link[^>]*?(intercom|chat|widget)[^>]*?>/gi, '')
+      .replace(/<iframe[\s\S]*?<\/iframe>/gi, '') // remove any iframe
       .replace(/Accept<\/a>/gi, '')
-      // Remove chat widget icons (JS or iframe-based)
-      .replace(/<script[^>]*chat[^>]*>[\s\S]*?<\/script>/gi, '')
-      .replace(/<iframe[^>]*chat[^>]*>[\s\S]*?<\/iframe>/gi, '')
-      .replace(/<div[^>]*chat[^>]*?>[\s\S]*?<\/div>/gi, '')
-      .replace(/<div[^>]*intercom[^>]*?>[\s\S]*?<\/div>/gi, '')
-      .replace(/<script[\s\S]*?widget[\s\S]*?<\/script>/gi, '');
+      .replace(/This site uses cookies[^<]+/gi, '');
 
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(html);
